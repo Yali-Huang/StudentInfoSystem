@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Title</title>
+    <link href="../static/css/index.css" rel="stylesheet" />
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.js"></script>
+    <link
+      href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/4.5.3/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery-validate/1.9.0/jquery.validate.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery-validate/1.9.0/additional-methods.js"></script>
+  </head>
+
+  <body>
+    <div id="wrap">
+      <div id="div1">
+        <div class="div1a">
+          <img
+            class="img1"
+            style="width: 300px; height: 200px"
+            src="/static/images/2.png"
+            alt="setting"
+          />
+        </div>
+        <div class="div1b">
+          <div class="div1b1">
+            <h1 style="color: darkcyan">Student Information System</h1>
+          </div>
+        </div>
+      </div>
+      <div id="div2">
+        <div class="div2outerLeft">
+          <div class="crud" id="div2showall">
+            <h4>Show All</h4>
+          </div>
+          <div class="crud" id="div2create">
+            <h4>Add</h4>
+          </div>
+          <div class="crud" id="div2cretedelete">
+            <h4>Delete</h4>
+          </div>
+          <div class="crud" id="div2creteupdate">
+            <h4>Update</h4>
+          </div>
+        </div>
+        <div class="div2outerRight">
+          <div class="showWindow" id="createwindow">
+            <div id="addinfo"></div>
+          </div>
+          <div class="showWindow" id="deleteupdatewindow" style="display: none">
+            <h4>Please input the student id</h4>
+            <div id="search-field">
+              <input type="text" id="student_id" />
+              <button id="search" type="submit" name="submit" value="">
+                Search by name
+              </button>
+            </div>
+          </div>
+          <div class="showWindow" id="showallwindow" style="display: none">
+            <h4>Show all result</h4>
+            <div id="showalldata"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+  <script type="text/javascript">
+    $(document).ready(function () {
+      $("#search").click(function () {
+        var student_id = {
+          student_id: $("#student_id").val(),
+        };
+        $.ajax({
+          type: "POST",
+          url: "/search",
+          data: student_id,
+          success: function (response) {
+            $("#search").html(responseHtml);
+            console.log(response);
+          },
+        });
+      });
+      $("#div2create").click(function () {
+        $("#createwindow").show();
+        $("#deleteupdatewindow").hide();
+        $("#showallwindow").hide();
+        $.ajax({
+          type: "GET",
+          url: "/add",
+          data: null,
+          dataType: "html",
+          success: function (responseHtml) {
+            console.log("responseHtml", responseHtml);
+            $("#addinfo").html(responseHtml);
+          },
+        });
+      });
+      $("#div2creteupdate").click(function () {
+        console.log("read");
+        $("#createwindow").hide();
+        $("#deleteupdatewindow").show();
+        $("#showallwindow").hide();
+      });
+      $("#div2showall").click(function () {
+        console.log("showall");
+        $("#createwindow").hide();
+        $("#deleteupdatewindow").hide();
+        $("#showallwindow").show();
+        $.ajax({
+          type: "GET",
+          url: "/query_all",
+          data: null,
+          dataType: "html",
+          success: function (responseHtml) {
+            console.log("responseHtml", responseHtml);
+            $("#showalldata").html(responseHtml);
+          },
+        });
+      });
+      $("#showalldata>tStudents>tbody>tr").on("click", function () {
+        alert("select");
+        console.log("tr clicked");
+        $(this).parent().find("tr.focus").toggleClass("focus");
+        $(this).toggleClass("focus");
+      });
+    });
+  </script>
+  <style>
+    tr.focus {
+      background-color: #eee;
+    }
+  </style>
+</html>

@@ -1,0 +1,31 @@
+.wrapper {
+  max-width: 1200px;
+  min-width: 800px;
+  width: 90%;
+  height: 2000px;
+  margin: 0 auto;
+}
+
+#title {
+  background: #062d74;
+  max-width: 1200px;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+}
+#list {
+  background: #0b3d8f;
+  max-width: 1200px;
+  height: 200px;
+  display: flex;
+  justify-content: center;
+}
+
+#modifywindow {
+  margin-top: 20px;
+  background: #e9e6e2;
+  height: 500px;
+  max-width: 1200px;
+  display: flex;
+  justify-content: center;
+}
