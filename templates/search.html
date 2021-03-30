@@ -1,0 +1,33 @@
+{% extends 'base.html' %} {% block content %}
+
+<form action="{{ url_for('search') }}" method="post">
+  <h3>Search</h3>
+  {% with msgs=get_flashed_messages() %} {% if msgs %} {% for msg in msgs %}
+  <p style="color: red">{{ msg }}</p>
+  {% endfor %} {% endif %} {% endwith %}
+  <div class="div2outerRight">
+    <div class="showWindow" id="createwindow">
+      <h4>Please input the student id</h4>
+      <div id="form-group">
+        <input
+          type="number"
+          id="student_id"
+          name="student_id"
+          class="form-control"
+        />
+      </div>
+      <h4></h4>
+      <div class="form-group">
+        <div class="col-md-10 col-md-offset-2">
+          <input
+            id="btnSubmit"
+            type="submit"
+            class="btn btn-primary"
+            value="Search"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+{% endblock %}

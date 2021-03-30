@@ -1,18 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <title>student</title>
-    <link href="../static/css/index.css" rel="stylesheet" />
-    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.js"></script>
-    <link
-      href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/4.5.3/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <script src="https://cdn.bootcdn.net/ajax/libs/jquery-validate/1.9.0/jquery.validate.min.js"></script>
-    <script src="https://cdn.bootcdn.net/ajax/libs/jquery-validate/1.9.0/additional-methods.js"></script>
-  </head>
-  <body>
+{% extends 'base.html' %}
+
+{% block content %}
+     {% if type==0 %}
+     <h3>All student information</h3>
+     {% else %}
+     <h3>Filter student information by ID</h3>
+     {% endif%}
     <table border="1" id="tStudents">
       <thead>
         <th>Student_ID</th>
@@ -23,8 +16,8 @@
       </thead>
       <tbody>
         {% for row in rows %}
-        <tr>
-          <td>{{ row["student_id"] }}</td>
+        <tr sid = "{{ row["student_id"] }}">
+          <td >{{ row["student_id"] }}</td>
           <td>{{ row["first_name"] }}</td>
           <td>{{ row["last_name"] }}</td>
           <td>{{ row["dob"] }}</td>
@@ -32,14 +25,63 @@
         </tr>
         {% endfor %}
       </tbody>
+	   <tfoot>
+		<tr>
+			<td>
+			    <form action="{{ url_for('update') }}" method="get">
+                  <input
+                    type="hidden"
+                    id="student_id"
+                    name="student_id"
+					value = "-1"
+                  />
+				<input
+                    id="btn_update"
+                    type="submit"
+                    class="btn btn-primary"
+                    value="Update"
+                  />
+				  </form>
+			</td>
+			<td>
+			    <form action="{{ url_for('delete') }}" method="post">
+                  <input
+                    type="hidden"
+                    id="student_id2"
+                    name="student_id"
+					value = "-1"
+                  />
+				<input
+                    id="btn_delete"
+                    type="submit"
+                    class="btn btn-primary"
+                    value="Delete"
+                  />
+				  </form>
+			</td>
+		</tr>
+	  </tfoot>
       <script type="text/javascript">
+		$("#btn_update").hide();
+		$("#btn_delete").hide();
+		$("#student_id").val("-1")
+		$("#student_id2").val("-1")
         $("#tStudents>tbody>tr").on("click", function () {
-          console.log("tr clicked");
-          $(this).parent().find("tr.focus").toggleClass("focus");
-          $(this).toggleClass("focus");
-          var row = $(this).parent().find("tr.focus"); //获取选中行
-          var id = row.find("student_id");
-          alert(row);
+		  if ( $(this).attr('sid') == $(this).parent().find("tr.focus").attr('sid')) {
+			$("#btn_update").hide();
+			$("#btn_delete").hide();
+			$(this).toggleClass("focus");
+			$("#student_id").val("-1")
+			$("#student_id2").val("-1")
+		  }
+		  else {
+			$("#btn_update").show();
+			$("#btn_delete").show();
+			$("#student_id").val($(this).attr('sid'))
+			$("#student_id2").val($(this).attr('sid'))
+			$(this).parent().find("tr.focus").toggleClass("focus");
+			$(this).toggleClass("focus");
+		  }
         });
       </script>
       <style>
@@ -48,5 +90,4 @@
         }
       </style>
     </table>
-  </body>
-</html>
+{% endblock %}

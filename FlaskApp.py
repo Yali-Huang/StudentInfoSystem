@@ -8,16 +8,16 @@ from flask_sqlalchemy import SQLAlchemy
 
 
 class Config(object):
-    SQLALCHEMY_DATABASE_URI = "sqlite:////./data.db"  # local database
+    SQLALCHEMY_DATABASE_URI = "sqlite:///./data.db"  # local database
     SQLALCHEMY_TRACK_MODIFICATIONS = True
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True
     SQLALCHEMY_ECHO = True
 
 
 app = Flask(__name__)
+app.secret_key = b'_5#ya2L"F4Q8z\n\xec]/'
 app.config.from_object(Config)
 db = SQLAlchemy(app)
-
 # define the student model
 
 
@@ -30,12 +30,18 @@ class Student(db.Model):
     amount_due = db.Column(db.Float(), unique=False)
 
 
+# create db from model
+db.create_all()
+db.session.commit()
+
+
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return redirect(url_for('query_all'))
+    # return render_template('index.html')
 
 
-@app.route('/', methods=['POST', 'GET'])
+@app.route('/add', methods=['POST', 'GET'])
 def add():
     if request.method == 'POST':
         #student_id = request.form['student_id']
@@ -53,24 +59,28 @@ def add():
                 amount_due=amount_due)
             db.session.add(new_student)
             db.session.commit()
+            # return 'scuess'
             return redirect(url_for('query_all'))
         except Exception as e:
             flash("{}".format(e))
             return 'failed'
+    else:
+        return render_template('student.html')
 
 
 @app.route('/delete', methods=['POST', 'GET'])
-def Delete():
+def delete():
     if request.method == 'POST':
         student_id = request.form['student_id']
-        student = Student.query.filter_by(student_id="唐家三少").first()
-        db.session.delete(author)
+        student = Student.query.filter_by(student_id=student_id).first()
+        db.session.delete(student)
         db.session.commit()
-        return redirect(url_for('result'))
+        # return redirect(url_for('result'))
+        return redirect(url_for('query_all'))
 
 
 @app.route('/update', methods=['POST', 'GET'])
-def Update():
+def update():
     if request.method == 'POST':
         student_id = request.form['student_id']
         first_name = request.form['first_name']
@@ -85,8 +95,18 @@ def Update():
             student.amount_due = amount_due
             db.session.add(student)
             db.session.commit()
-            return redirect(url_for('result'))
+            return redirect(url_for('query_all'))
         except Exception as e:
+            print(e)
+            flash("{}".format(e))
+            return redirect(url_for('/'))
+    else:
+        try:
+            student_id = request.args.get('student_id')
+            student = Student.query.get(student_id)
+            return render_template('student_update.html', row=student)
+        except Exception as e:
+            print(e)
             flash("{}".format(e))
             return redirect(url_for('/'))
 
@@ -96,43 +116,27 @@ def query_all():
     rows = None
     try:
         rows = Student.query.all()
-        return render_template('result.html', rows=rows)
+        print('rows:', rows)
+        return render_template('result.html', rows=rows, type=0)
     except Exception as e:
         flash("{}".format(e))
+        print('error:', e)
     return 'failed'
 
 
 @app.route('/search', methods=['POST', 'GET'])
 def search():
-    print('Search')
     if request.method == 'POST':
-        student_id = request.form['student_id']
-#         first_name  = request.form['first_name']
-#         last_name  = request.form['last_name']
-#         dob = request.form['dob']
-#         amount_due = request.form['amount_due']
-
+        s_id = request.form['student_id']
         rows = None
+        rows = Student.query.filter_by(student_id=s_id)
 
-#         if( first_name ):
-#            rows = Student.query.filter_by(first_name=first_name).all()
-
-#         if( last_name ):
-#            rows = Student.query.filter_by(last_name=last_name).all()
-
-#         if( amount_due>0 ):
-#            rows = Student.query.filter_by(amount_due>0).all()
-
-        if(student_id):
-            print(f'search {student_id}')
-            rows = Student.query.filter_by(student_id=student_id).all()
-
-        return render_template('result.html', rows=rows)
-
-    return 'Failed'
+        return render_template('result.html', rows=rows, type=1)
+    else:
+        return render_template('search.html')
 
 
 if __name__ == '__main__':
-    # db.drop_all() #the first time run this
+    # db.drop_all() #first time run
     # db.create_all()#create table
     app.run(debug=False)
